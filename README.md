@@ -1,18 +1,12 @@
-- 프로젝트 설명
-- 설치 및 실행 방법
-- API 문서
-- 데이터베이스 스키마 설명
-- 성능 최적화 방법에 대한 설명
-
-## 프로젝트 설명
+## 1. 프로젝트 설명
 
 엑셀 파일을 통해 환자 정보를 등록/조회 합니다.
 엑셀의 첫행은 `차트번호, 이름, 전화번호, 주민등록번호, 주소`의 형식이여야 합니다.
 
-## 설치 및 실행 방법
+## 2. 설치 및 실행 방법
 
-### 1.설치
-```bash
+### 2.1. 설치
+``` bash
 $ git clone https://github.com/Kimsunmin/motionlabs-test.git
 
 # pnpm
@@ -22,9 +16,9 @@ $ pnpm install
 $ npm install
 ```
 
-### 2. 실행 방법
+### 2.2. 실행 방법
 
-```bash
+``` bash
 # development
 $ pnpm run start
 
@@ -36,12 +30,16 @@ $ pnpm run build
 $ pnpm run start:prod
 ```
 
-## API 문서
+## 3. API 문서
 
-! 작성 필요
+#### 환자 목록 조회
+> `Get: /v1/patients`
 
-## 데이터베이스 스키마 설명
-```typscript
+#### 환자 목록 일괄 등록 - 엑셀
+> `Post: /v1/patients`
+
+## 4. 데이터베이스 스키마 설명
+``` typescript
 @Entity({ name: 'patients' })
 export class Patient {
   @PrimaryGeneratedColumn({ comment: '고유 ID' })
@@ -73,7 +71,7 @@ export class Patient {
 }
 ```
 
-## 성능 최적화 방법에 대한 설명
+## 5. 성능 최적화 방법에 대한 설명
 ! 작성 필요
 
 ### History
