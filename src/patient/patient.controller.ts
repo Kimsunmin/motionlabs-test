@@ -4,6 +4,7 @@ import {
   UploadPatientResponseDto,
 } from '@/patient/dtos/upload-patient.dto';
 import { PatientService } from '@/patient/services/patient.service';
+import { ErrorResponseDto } from '@/shared/dtos/error-response.dto';
 import { PaginationQueryDto } from '@/shared/dtos/pagination-query.dto';
 import {
   ClassSerializerInterceptor,
@@ -23,6 +24,7 @@ import {
   ApiCreatedResponse,
   ApiOkResponse,
   ApiOperation,
+  ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
 
@@ -36,11 +38,21 @@ export class PatientController {
 
   @Get()
   @ApiOperation({
-    summary: '환자 정보 전체 조회 API',
-    description: '환자 정보를 전체 조회합니다.',
+    summary: '환자 목록 조회',
+    description: '등록된 환자 목록을 조회합니다.',
   })
   @ApiOkResponse({
     type: GetPatientsResponseDto,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Query 파라미터 유효성 검사 실패',
+    type: ErrorResponseDto,
+  })
+  @ApiResponse({
+    status: 422,
+    description: '데이터베이스 테이블을 찾지 못함',
+    type: ErrorResponseDto,
   })
   @UseInterceptors(ClassSerializerInterceptor)
   async getPatients(
@@ -54,14 +66,24 @@ export class PatientController {
   @Post('upload')
   @UseInterceptors(FileInterceptor('file'))
   @ApiOperation({
-    summary: '환자 정보 업로드 (excel)',
+    summary: '환자 정보 일괄 등록 (엑셀 업로드)',
     description:
-      '엑셀 파일을 통해 환자 정보를 업로드 합니다. <br> 이때 엑셀의 첫 행은 아래와 같아야 합니다. <br> 차트번호,이름,전화번호,주민등록번호,주소,메모',
+      '엑셀 파일을 업로드하여 환자 정보를 일괄 등록합니다. <br><br> 이때 엑셀의 첫 행은 아래와 같아야 합니다. <br> 차트번호,이름,전화번호,주민등록번호,주소,메모',
   })
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: UploadPatientRequestDto })
   @ApiCreatedResponse({ type: UploadPatientResponseDto })
-  async uploadPatientFile(
+  @ApiResponse({
+    status: 422,
+    description: '엑셀 시트 헤더 유효성 검사 실패',
+    type: ErrorResponseDto,
+  })
+  @ApiResponse({
+    status: 422,
+    description: '엑셀 파일 확장자 유효성 검사 실패',
+    type: ErrorResponseDto,
+  })
+  async uploadPatientsByFile(
     @UploadedFile(
       new ParseFilePipeBuilder()
         .addFileTypeValidator({
@@ -74,7 +96,7 @@ export class PatientController {
   ): Promise<UploadPatientResponseDto> {
     const startTime = new Date();
     const { insertedCount, totalCount, failedCount } =
-      await this.patientService.loadPatientsByExcel(file);
+      await this.patientService.uploadPatientsByExcel(file);
 
     const endTime = new Date();
     return {

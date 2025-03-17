@@ -1,3 +1,4 @@
+import { ErrorResponseDto } from '@/shared/dtos/error-response.dto';
 import {
   ArgumentsHost,
   Catch,
@@ -12,10 +13,10 @@ export class TypeOrmFilter implements ExceptionFilter {
     const response = host.switchToHttp().getResponse();
 
     const status = HttpStatus.UNPROCESSABLE_ENTITY;
-    const json = {
+    const json: ErrorResponseDto = {
+      statusCode: status,
       message: exception.message,
       error: exception.name,
-      statusCode: status,
     };
 
     response.status(status).json(json);

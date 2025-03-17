@@ -32,6 +32,6 @@ export class Patient {
   @CreateDateColumn({ comment: '생성일' })
   createdAt: Date;
 
-  @UpdateDateColumn({ nullable: true, comment: '수정일' })
-  updatedAt: Date | null;
+  @UpdateDateColumn({ comment: '수정일' })
+  updatedAt: Date;
 }

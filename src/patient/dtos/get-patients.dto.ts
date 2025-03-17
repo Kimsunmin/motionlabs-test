@@ -4,40 +4,48 @@ import { Expose } from 'class-transformer';
 
 export class GetPatientsDto {
   @Expose()
-  @ApiProperty()
+  @ApiProperty({ description: '고유 ID' })
   id: number;
 
   @Expose()
-  @ApiProperty()
+  @ApiProperty({ description: '이름' })
   name: string;
 
   @Expose()
-  @ApiProperty()
+  @ApiProperty({ description: '전화 번호' })
   phoneNumber: string;
 
   @Expose()
-  @ApiProperty()
+  @ApiProperty({ description: '차트 번호', nullable: true })
   chartNumber?: string;
 
   @Expose()
-  @ApiProperty()
+  @ApiProperty({ description: '마스킹된 주민등록번호' })
   ssn: string;
 
   @Expose()
-  @ApiProperty()
+  @ApiProperty({ description: '메모', nullable: true })
   memo?: string;
 
-  @ApiProperty()
+  @Expose()
+  @ApiProperty({ description: '생성일' })
   createdAt: Date;
 
-  @ApiProperty()
+  @Expose()
+  @ApiProperty({ description: '수정일' })
   updatedAt: Date;
 }
 
 export class GetPatientsResponseDto {
-  @ApiProperty({ isArray: true, type: GetPatientsDto })
+  @ApiProperty({
+    description: '환자 목록 응답 데이터',
+    isArray: true,
+    type: GetPatientsDto,
+  })
   data: GetPatientsDto[];
 
-  @ApiProperty()
+  @ApiProperty({
+    description: '페이지네이션 메타 데이터',
+  })
   meta: PaginationMetaDto;
 }

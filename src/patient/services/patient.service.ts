@@ -17,21 +17,23 @@ export class PatientService {
   async getPatients(
     query: PaginationQueryDto,
   ): Promise<{ data: Patient[]; count: number }> {
-    const [data, count] = await this.patientRespoitory.findAndCount({
+    const [patients, count] = await this.patientRespoitory.findAndCount({
       take: query.pageSize,
       skip: (query.page - 1) * query.pageSize,
       order: { id: 'ASC' },
     });
 
+    const getPatientsDtos = plainToInstance(GetPatientsDto, patients, {
+      excludeExtraneousValues: true,
+    });
+
     return {
-      data: plainToInstance(GetPatientsDto, data, {
-        excludeExtraneousValues: true,
-      }),
+      data: getPatientsDtos,
       count,
     };
   }
 
-  async loadPatientsByExcel(file: Express.Multer.File) {
+  async uploadPatientsByExcel(file: Express.Multer.File) {
     const rows = this.patientLoadService.fromExcel(file);
 
     const filterPatients = this.deduplicatePatients(rows.patients);

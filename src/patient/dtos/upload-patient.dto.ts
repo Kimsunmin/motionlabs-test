@@ -18,28 +18,28 @@ export class UploadPatientRequestDto {
 }
 
 export class UploadPatientResponseDataDto {
-  @ApiProperty()
+  @ApiProperty({ description: '적재 건수' })
   insertedCount: number;
 
-  @ApiProperty()
+  @ApiProperty({ description: '적재 실패 건수' })
   failedCount: number;
 }
 
 export class UploadPatientResponseMetaDto {
-  @ApiProperty()
+  @ApiProperty({ description: '총 건수' })
   totalCount: number;
 
-  @ApiProperty()
+  @ApiProperty({ description: '적재 시간 시간' })
   startTime: Date;
 
-  @ApiProperty()
+  @ApiProperty({ description: '적재 완료 시간' })
   endTime: Date;
 }
 
 export class UploadPatientResponseDto {
-  @ApiProperty()
+  @ApiProperty({ description: '환자 정보 일괄 등록 응답' })
   data: UploadPatientResponseDataDto;
 
-  @ApiProperty()
+  @ApiProperty({ description: '응답 메타 정보' })
   meta: UploadPatientResponseMetaDto;
 }

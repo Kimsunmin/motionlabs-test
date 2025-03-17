@@ -45,13 +45,68 @@ $ pnpm run start:prod
 * swagger 문서
   > http://localhost:3000/swagger
 
-## 3. API 문서
+## 3. API 명세
 
 #### 환자 목록 조회
-> `Get: /v1/patients`
 
-#### 환자 목록 일괄 등록 - 엑셀
-> `Post: /v1/patients`
+*   **Endpoint:** `GET /v1/patients`
+*   **설명:** 등록된 환자 목록을 조회합니다.
+*   **요청 쿼리 파라미터:**
+    *   `page` (number, optional, 기본값: 1): 페이지 번호.
+    *   `pageSize` (number, optional, 기본값: 10): 페이지당 환자 수.
+*   **응답 (성공 시 200 OK):**
+
+    ```json
+    {
+      "data": [
+        {
+          "id": 1,
+          "name": "홍길동",
+          "phoneNumber": "01012345678",
+          "chartNumber": "12345",
+          "ssn": "XXXXXX-XXXXXXX",
+          "address": "서울시 강남구",
+          "memo": "특이사항 없음",
+          "createdAt": "2023-12-27T10:00:00.000Z",
+          "updatedAt": "2023-12-27T12:00:00.000Z"
+        },
+        // ... 추가 환자 정보 ...
+      ],
+      "meta": {
+        "totalCount": 100 // 전체 환자 수
+      }
+    }
+    ```
+*   **응답 (실패시):**
+    *   **400 Bad Request**: 잘못된 요청 쿼리 파라미터가 있을 경우
+    *   **422 Unprocessable Entity**: 데이터베이스 오류
+
+#### 환자 정보 일괄 등록 (엑셀 업로드)
+
+*   **Endpoint:** `POST /v1/patients/upload`
+*   **설명:** 엑셀 파일을 업로드하여 환자 정보를 일괄 등록합니다.
+*   **요청 Content-Type:** `multipart/form-data`
+*   **요청 바디 (multipart/form-data):**
+    *   `file` (file, required): 환자 정보가 담긴 엑셀 파일 (.xlsx 형식).
+    *   **엑셀 파일 형식**: 첫번째 행은 `차트번호,이름,전화번호,주민등록번호,주소,메모` 순서의 컬럼명을 가져야합니다.
+*   **응답 (성공 시 201 Created):**
+
+    ```json
+    {
+      "data": {
+        "insertedCount": 95, // 성공적으로 삽입된 환자 수
+        "failedCount": 5     // 삽입에 실패한 환자 수
+      },
+      "meta": {
+        "totalCount": 100,   // 엑셀 파일의 총 환자 수
+        "startTime": "2023-12-27T10:00:00.000Z", // 작업 시작 시간
+        "endTime": "2023-12-27T10:00:05.000Z"    // 작업 종료 시간
+      }
+    }
+    ```
+* **응답 (실패시)**
+    * **422 Unprocessable Entity**: 파일 형식이 `.xlsx`가 아닌 경우.
+    * **422 Unprocessable Entity**: 엑셀 시트 내에 헤더행 유료성 검사 실패
 
 ## 4. 데이터베이스 스키마 설명
 ``` typescript
@@ -81,8 +136,8 @@ export class Patient {
   @CreateDateColumn({ comment: '생성일' })
   createdAt: Date;
 
-  @UpdateDateColumn({ nullable: true, comment: '수정일' })
-  updatedAt: Date | null;
+  @UpdateDateColumn({ comment: '수정일' })
+  updatedAt: Date;
 }
 ```
 
@@ -112,7 +167,7 @@ export class Patient {
 > `src/patient/repositories/patient.repository.ts > batchInsert()` 참조
 1. 데이터 청크 단위 삽입
    * 저장할 환자 정보 데이터를 `chunkSize` 단위로 나누어 적재
-   * 적재시 `save()`가 아닌 `insert()`를 활용해 bulk 적재 효율 증가
+   * 적재시 `save()`가 아닌 `insert()`를 활용해 bulk insert 적재 효율 증가
    
 2. 트랜잭션 적용
    * TypeOrm의 `queryRunner`를 이용해 나눈 데이터의 모든 퀴리가 정상 작동시 commit
